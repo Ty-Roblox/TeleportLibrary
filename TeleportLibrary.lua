@@ -65,19 +65,21 @@ function TeleportLibrary.new(Options)
     getgenv().GithubFetch = GithubFetch
     getgenv().Server = loadstring(GithubFetch(TeleportLibrary.User, TeleportLibrary.Name, 'Server.lua'))()
     getgenv().ServerManager = loadstring(GithubFetch(TeleportLibrary.User, TeleportLibrary.Name, 'ServerManager.lua'))()
-    This.Manager = ServerManager.new()
-    This.Mode = Options.FastMode or false
-    This.PlaceId = Options.PlaceId or game.PlaceId
-    This.Method = Options.Method or 'Asc'
-    This.FreeSlots = Options.FreeSlots or 1
+    This.Settings = {}
+    This.Settings.FastMode = Options.FastMode or false
+    This.Settings.PlaceId = Options.PlaceId or game.PlaceId
+    This.Settings.Method = Options.Method or 'Asc'
+    This.Settings.FreeSlots = Options.FreeSlots or 1
+    This.Settings.RequestInterval = Options.RequestInterval or .25
+    This.Manager = ServerManager.new(This.Settings)
     return setmetatable(This, TeleportLibrary)
 end
 
 function TeleportLibrary:GetServers()    
-    local ServersRaw = self.Manager:GetAllServers(self.PlaceId, self.Mode)
+    local ServersRaw = self.Manager:GetAllServers()
     local Filtered = {}
     for i,v in ipairs(ServersRaw) do
-        if v.maxPlayers and v.id and v.playing and (v.playing + self.FreeSlots) < v.maxPlayers and v.id ~= game.JobId then
+        if v.maxPlayers and v.id and v.playing and (v.playing + self.Settings.FreeSlots) < v.maxPlayers and v.id ~= game.JobId then
             table.insert(Filtered, v)
         end
     end
@@ -92,7 +94,7 @@ function TeleportLibrary:GetServers()
     end)
     local Servers = {}
     for i,v in ipairs(Filtered) do
-        local ServerInstance = Server.new(v.id, v.maxPlayers, v.playing, v.fps, v.ping, self.PlaceId)
+        local ServerInstance = Server.new(v.id, v.maxPlayers, v.playing, v.fps, v.ping, self.Settings.PlaceId)
         if (not ServerInstance:IsBlacklisted()) then
             table.insert(Servers, ServerInstance)
         end
