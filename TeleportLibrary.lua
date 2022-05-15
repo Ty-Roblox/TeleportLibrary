@@ -69,8 +69,11 @@ function TeleportLibrary.new(Options)
     This.Settings.FastMode = Options.FastMode or false
     This.Settings.PlaceId = Options.PlaceId or game.PlaceId
     This.Settings.Method = Options.Method or 'Asc'
+    This.Settings.MaxPages = Options.MaxPages or 5
+    This.Settings.LowestPing = Options.LowestPing or true
     This.Settings.FreeSlots = Options.FreeSlots or 1
     This.Settings.RequestInterval = Options.RequestInterval or .25
+    This.Settings.RemoveBlacklisted = Options.RemoveBlacklisted or true
     This.Manager = ServerManager.new(This.Settings)
     return setmetatable(This, TeleportLibrary)
 end
@@ -93,12 +96,18 @@ function TeleportLibrary:GetServers()
             return First.playing > Second.playing
         end
     end)
+    if self.Settings.LowestPing then
+        table.sort(Filtered, function(First, Second)
+            return First.ping < Second.ping
+        end)
+    end
     local Servers = {}
     for i,v in ipairs(Filtered) do
         local ServerInstance = Server.new(v.id, v.maxPlayers, v.playing, v.fps, v.ping, self.Settings.PlaceId)
-        if (not ServerInstance:IsBlacklisted()) then
-            table.insert(Servers, ServerInstance)
+        if ServerInstance:IsBlacklisted() and (self.Settings.RemoveBlacklisted) then
+            continue
         end
+        table.insert(Servers, ServerInstance)
     end
     return Servers
 end

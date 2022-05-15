@@ -16,7 +16,7 @@ function Server.new(id, maxPlayers, playing, fps, ping, placeId)
     return setmetatable(This, Server)
 end
 
-function Server:UpdateBlacklistTime(Time)
+function Server:Blacklist(Time)
     local Blacklisted
     if (isfile(self.Filename)) then
         local Content = readfile(self.Filename)
