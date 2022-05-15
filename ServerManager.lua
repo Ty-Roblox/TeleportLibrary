@@ -16,7 +16,7 @@ end
 
 function ServerManager:GetServerPage(Cursor)
     local Request=syn.request({
-        Url=string.format('https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Desc&limit=100%s', tostring(self.Settings.PlaceId), (Cursor and string.format('cursor=%s', Cursor)) or '');
+        Url=string.format('https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=%s&limit=100%s', tostring(self.Settings.PlaceId), self.Settings.Method, (Cursor and string.format('cursor=%s', Cursor)) or '');
         Method='GET';
     })
     if Request and Request.Success then

@@ -83,10 +83,11 @@ function TeleportLibrary:GetServers()
             table.insert(Filtered, v)
         end
     end
+    local Method = self.Settings.Method
     table.sort(Filtered, function(First, Second)
-        if Method=='Asc' then
+        if Method == 'Asc' then
             return First.playing < Second.playing
-        elseif Method=='Desc' then
+        elseif Method == 'Desc' then
             return First.playing > Second.playing
         else 
             return First.playing > Second.playing
