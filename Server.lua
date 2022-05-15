@@ -12,7 +12,46 @@ function Server.new(id, maxPlayers, playing, fps, ping, placeId)
     This.fps = fps or 60
     This.ping = ping or 0
     This.placeId = placeId or game.PlaceId
+    This.Filename = 'TeleportLibraryServers.json'
     return setmetatable(This, Server)
+end
+
+function Server:UpdateBlacklistTime(Time)
+    local Blacklisted
+    if (isfile(self.Filename)) then
+        local Content = readfile(self.Filename)
+        Blacklisted = HttpService:JSONDecode(Content)
+    else
+        Blacklisted = {}
+    end
+    local Clean = {}
+    local Changed = false
+    for i,v in ipairs(Blacklisted) do
+        if (os.time() - v.Time) <= Time then
+            table.insert(Clean, v)
+        else
+            Changed = true
+        end
+    end
+    if Changed then
+        writefile(self.Filename, HttpService:JSONEncode(Clean))
+    end
+end
+
+function Server:IsBlacklisted() 
+    local Blacklisted
+    if (isfile(self.Filename)) then
+        local Content = readfile(self.Filename)
+        Blacklisted = HttpService:JSONDecode(Content)
+    else
+        return false
+    end
+    for i,v in ipairs(Blacklisted) do
+        if v and v.JobId and v.JobId == self.id then
+            return true
+        end
+    end
+    return false
 end
 
 function Server:Join(Options)
