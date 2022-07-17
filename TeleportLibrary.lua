@@ -63,9 +63,16 @@ function TeleportLibrary.new(Options)
     getgenv().Print = Print
     getgenv().RecursiveHTTPGet = RecursiveHTTPGet
     getgenv().GithubFetch = GithubFetch
-    getgenv().Server = loadstring(GithubFetch(TeleportLibrary.User, TeleportLibrary.Name, 'Server.lua'))()
-    getgenv().ServerManager = loadstring(GithubFetch(TeleportLibrary.User, TeleportLibrary.Name, 'ServerManager.lua'))()
+
+    if Options.Debug then
+        getgenv().Server = loadstring(readfile'TPLIB/Server.lua')()
+        getgenv().ServerManager = loadstring(readfile'TPLIB/ServerManager.lua')()
+    else
+        getgenv().Server = loadstring(GithubFetch(TeleportLibrary.User, TeleportLibrary.Name, 'Server.lua'))()
+        getgenv().ServerManager = loadstring(GithubFetch(TeleportLibrary.User, TeleportLibrary.Name, 'ServerManager.lua'))()
+    end
     This.Settings = {}
+    This.Settings.Debug = Options.Debug or false
     This.Settings.FastMode = Options.FastMode or false
     This.Settings.PlaceId = Options.PlaceId or game.PlaceId
     This.Settings.Method = Options.Method or 'Asc'
@@ -80,6 +87,9 @@ end
 
 function TeleportLibrary:GetServers()    
     local ServersRaw = self.Manager:GetAllServers()
+    if self.Settings.Debug then
+        Print('DEBUG Servers:', #ServersRaw)
+    end
     local Filtered = {}
     for i,v in ipairs(ServersRaw) do
         if v.maxPlayers and v.id and v.playing and (v.playing + self.Settings.FreeSlots) < v.maxPlayers and v.id ~= game.JobId then
