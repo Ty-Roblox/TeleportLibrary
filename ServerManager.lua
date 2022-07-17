@@ -29,7 +29,7 @@ function ServerManager:GetAllServers()
     local Cursor
     local Idx = 0
     while true do
-        local Page = self:GetServerPage(self.Settings.PlaceId, Cursor)
+        local Page = self:GetServerPage(Cursor)
         if Page and Page.data then
             Idx += 1
             for i,v in ipairs(Page.data) do
